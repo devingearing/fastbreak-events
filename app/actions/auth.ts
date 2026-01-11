@@ -37,6 +37,17 @@ export async function signUp(prevState: any, formData: FormData) {
   })
 
   if (error) {
+    // Check if user already exists but is unverified
+    if (error.code === 'user_already_registered' || error.message.includes('already been registered')) {
+      return {
+        error: {
+          message: 'An account with this email already exists. Please check your email for the verification link or use the button below to resend it.',
+          code: 'unverified_email',
+          email: validatedFields.data.email,
+        },
+      }
+    }
+
     return {
       error: {
         message: error.message,
@@ -73,6 +84,17 @@ export async function signIn(prevState: any, formData: FormData) {
   const { error } = await supabase.auth.signInWithPassword(validatedFields.data)
 
   if (error) {
+    // Check if the error is due to unverified email
+    if (error.message.includes('Email not confirmed') || error.message.includes('email is not confirmed')) {
+      return {
+        error: {
+          message: 'Please verify your email before signing in. Check your inbox for the verification link.',
+          code: 'unverified_email',
+          email: validatedFields.data.email,
+        },
+      }
+    }
+
     return {
       error: {
         message: error.message,
@@ -118,4 +140,38 @@ export async function signOut() {
   }
 
   redirect('/')
+}
+
+export async function resendVerificationEmail(email: string) {
+  'use server'
+
+  const supabase = await createClient()
+
+  // There's no direct API to resend verification email in Supabase
+  // We'll try to sign up again which will trigger a new email if user exists but unverified
+  const { error, data } = await supabase.auth.signUp({
+    email,
+    password: Math.random().toString(36), // Dummy password, won't be used
+    options: {
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+    },
+  })
+
+  // If we get a user but no session, email was sent
+  if (data?.user && !data.session) {
+    return {
+      success: true,
+      message: 'Verification email sent! Please check your inbox.',
+    }
+  }
+
+  if (error) {
+    return {
+      error: 'Unable to resend verification email. Please try again later.',
+    }
+  }
+
+  return {
+    error: 'Unable to resend verification email. The account may already be verified.',
+  }
 }

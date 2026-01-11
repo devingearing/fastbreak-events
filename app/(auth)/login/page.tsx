@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
+import { ResendVerification } from "@/components/auth/resend-verification"
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(signIn, null)
@@ -24,9 +25,14 @@ export default function LoginPage() {
       <CardContent>
         <form action={formAction} className="space-y-4">
           {state?.error && 'message' in state.error && (
-            <Alert variant="destructive">
-              <AlertDescription>{state.error.message}</AlertDescription>
-            </Alert>
+            <>
+              <Alert variant="destructive">
+                <AlertDescription>{state.error.message}</AlertDescription>
+              </Alert>
+              {state.error.code === 'unverified_email' && state.error.email && (
+                <ResendVerification email={state.error.email} />
+              )}
+            </>
           )}
 
           <div className="space-y-2">
