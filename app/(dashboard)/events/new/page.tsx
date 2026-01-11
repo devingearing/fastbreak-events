@@ -2,6 +2,9 @@ import { getVenues } from '@/app/actions/venues'
 import { EventForm } from '@/components/forms/event-form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export default async function NewEventPage() {
   const result = await getVenues()
 

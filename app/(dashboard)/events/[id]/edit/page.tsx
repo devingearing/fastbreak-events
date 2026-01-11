@@ -4,6 +4,9 @@ import { EventForm } from '@/components/forms/event-form'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { notFound } from 'next/navigation'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export default async function EditEventPage({
   params,
 }: {

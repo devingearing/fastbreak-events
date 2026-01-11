@@ -28,7 +28,7 @@ export async function signUp(prevState: any, formData: FormData) {
     }
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { error, data } = await supabase.auth.signUp({
     email: validatedFields.data.email,
     password: validatedFields.data.password,
     options: {
@@ -44,6 +44,15 @@ export async function signUp(prevState: any, formData: FormData) {
     }
   }
 
+  // Check if email confirmation is required
+  if (data?.user && !data.session) {
+    return {
+      success: true,
+      message: 'Please check your email to verify your account before signing in.',
+    }
+  }
+
+  // If no email confirmation required, redirect
   redirect('/events')
 }
 
