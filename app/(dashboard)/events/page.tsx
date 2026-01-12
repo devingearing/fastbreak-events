@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import { getEvents } from '@/app/actions/events'
+import { getCurrentUser } from '@/app/actions/auth'
 import { EventsGrid } from '@/components/events/events-grid'
 import { EventFilters } from '@/components/events/event-filters'
 import { Button } from '@/components/ui/button'
@@ -14,10 +15,13 @@ export default async function EventsPage({
 }: {
   searchParams: { search?: string; sport_type?: string }
 }) {
-  const result = await getEvents({
-    search: searchParams.search,
-    sport_type: searchParams.sport_type,
-  })
+  const [result, currentUser] = await Promise.all([
+    getEvents({
+      search: searchParams.search,
+      sport_type: searchParams.sport_type,
+    }),
+    getCurrentUser()
+  ])
 
   if (result.error) {
     return (
@@ -49,7 +53,7 @@ export default async function EventsPage({
 
       <EventFilters />
 
-      <EventsGrid events={result.data || []} />
+      <EventsGrid events={result.data || []} currentUserId={currentUser?.id} />
     </div>
   )
 }

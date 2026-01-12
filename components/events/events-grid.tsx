@@ -9,9 +9,10 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 interface EventsGridProps {
   events: EventWithVenues[]
+  currentUserId?: string
 }
 
-export function EventsGrid({ events }: EventsGridProps) {
+export function EventsGrid({ events, currentUserId }: EventsGridProps) {
   const router = useRouter()
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -51,6 +52,7 @@ export function EventsGrid({ events }: EventsGridProps) {
             key={event.id}
             event={event}
             onDelete={setDeleteId}
+            isOwner={currentUserId === event.user_id}
           />
         ))}
       </div>

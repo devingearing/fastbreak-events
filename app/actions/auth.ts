@@ -153,6 +153,14 @@ export async function signOut() {
   redirect('/')
 }
 
+export async function getCurrentUser() {
+  'use server'
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  return user
+}
+
 export async function resendVerificationEmail(email: string) {
   'use server'
 

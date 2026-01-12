@@ -174,9 +174,6 @@ export async function getEvent(id: string) {
   return authActionWrapper(async (supabase, user) => {
     const db = supabase as any
 
-    console.log('Getting event with ID:', id)
-    console.log('Current user ID:', user.id)
-
     const { data, error } = await db
       .from('events')
       .select(`
@@ -188,17 +185,8 @@ export async function getEvent(id: string) {
       .eq('id', id)
       .single()
 
-    console.log('Query result:', { data, error })
-
-    if (error) {
-      console.error('Error fetching event:', error)
-      throw error
-    }
-
-    if (!data) {
-      console.log('No event found with ID:', id)
-      return null
-    }
+    if (error) throw error
+    if (!data) return null
 
     // Transform the data
     const event = data as any

@@ -9,9 +9,10 @@ import type { EventWithVenues } from '@/types'
 interface EventCardProps {
   event: EventWithVenues
   onDelete?: (id: string) => void
+  isOwner?: boolean
 }
 
-export function EventCard({ event, onDelete }: EventCardProps) {
+export function EventCard({ event, onDelete, isOwner = false }: EventCardProps) {
   return (
     <Card className="flex flex-col hover:shadow-lg transition-shadow">
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
@@ -38,20 +39,24 @@ export function EventCard({ event, onDelete }: EventCardProps) {
                 View Details
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href={`/events/${event.id}/edit`} className="flex items-center">
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="text-destructive focus:text-destructive flex items-center"
-              onClick={() => onDelete?.(event.id)}
-            >
-              <Trash className="mr-2 h-4 w-4" />
-              Delete
-            </DropdownMenuItem>
+            {isOwner && (
+              <>
+                <DropdownMenuItem asChild>
+                  <Link href={`/events/${event.id}/edit`} className="flex items-center">
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive flex items-center"
+                  onClick={() => onDelete?.(event.id)}
+                >
+                  <Trash className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </CardHeader>

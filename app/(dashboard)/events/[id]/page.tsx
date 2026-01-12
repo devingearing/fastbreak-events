@@ -1,4 +1,5 @@
 import { getEvent } from '@/app/actions/events'
+import { getCurrentUser } from '@/app/actions/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -19,18 +20,17 @@ export default async function EventDetailPage({
   const resolvedParams = await Promise.resolve(params)
   const eventId = resolvedParams.id
 
-  console.log('EventDetailPage - Event ID from params:', eventId)
-
-  const result = await getEvent(eventId)
-
-  console.log('EventDetailPage - Result:', result)
+  const [result, currentUser] = await Promise.all([
+    getEvent(eventId),
+    getCurrentUser()
+  ])
 
   if (result.error || !result.data) {
-    console.error('Event not found or error:', result.error)
     notFound()
   }
 
   const event = result.data
+  const isOwner = currentUser?.id === event.user_id
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -41,12 +41,14 @@ export default async function EventDetailPage({
             Back to Events
           </Link>
         </Button>
-        <Button asChild>
-          <Link href={`/events/${event.id}/edit`}>
-            <Edit className="mr-2 h-4 w-4" />
-            Edit Event
-          </Link>
-        </Button>
+        {isOwner && (
+          <Button asChild>
+            <Link href={`/events/${event.id}/edit`}>
+              <Edit className="mr-2 h-4 w-4" />
+              Edit Event
+            </Link>
+          </Button>
+        )}
       </div>
 
       <Card>
