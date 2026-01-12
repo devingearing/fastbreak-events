@@ -8,11 +8,50 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, CheckCircle } from "lucide-react"
+import { Loader2, CheckCircle, AlertCircle, Mail } from "lucide-react"
 import { ResendVerification } from "@/components/auth/resend-verification"
 
 export default function SignUpPage() {
   const [state, formAction, isPending] = useActionState(signUp, null)
+
+  // If user already exists but email is unverified
+  if (state?.error?.code === 'unverified_email' && state?.error?.email) {
+    return (
+      <Card>
+        <CardHeader className="space-y-1 text-center">
+          <div className="flex justify-center mb-4">
+            <AlertCircle className="h-12 w-12 text-yellow-500" />
+          </div>
+          <CardTitle className="text-2xl font-bold">Account Already Exists!</CardTitle>
+          <CardDescription className="text-base space-y-2">
+            <p>An account with <strong>{state.error.email}</strong> already exists.</p>
+            <p className="text-orange-600 font-medium">You need to verify your email before you can sign in.</p>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert>
+            <Mail className="h-4 w-4" />
+            <AlertDescription>
+              Check your email for the verification link we sent when you first signed up.
+              If you can't find it, you can request a new one below.
+            </AlertDescription>
+          </Alert>
+
+          <div className="space-y-4">
+            <ResendVerification email={state.error.email} />
+
+            <div className="text-center text-sm text-muted-foreground">
+              <p>Already verified your email?</p>
+            </div>
+
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/login">Go to Login</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   // If signup was successful and email verification is needed
   if (state?.success) {
@@ -36,10 +75,27 @@ export default function SignUpPage() {
 
           <div className="text-center text-sm text-muted-foreground">
             <p>Didn't receive the email?</p>
-            <p>Check your spam folder or request a new verification email.</p>
+            <p>Check your spam folder.</p>
           </div>
 
-          <div className="pt-4">
+          {state.email && (
+            <div className="space-y-4">
+              <ResendVerification email={state.email} />
+            </div>
+          )}
+
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or
+              </span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
             <Button asChild variant="outline" className="w-full">
               <Link href="/login">Go to Login</Link>
             </Button>
@@ -59,15 +115,10 @@ export default function SignUpPage() {
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">
-          {state?.error && 'message' in state.error && (
-            <>
-              <Alert variant="destructive">
-                <AlertDescription>{state.error.message}</AlertDescription>
-              </Alert>
-              {state.error.code === 'unverified_email' && state.error.email && (
-                <ResendVerification email={state.error.email} />
-              )}
-            </>
+          {state?.error && 'message' in state.error && state.error.code !== 'unverified_email' && (
+            <Alert variant="destructive">
+              <AlertDescription>{state.error.message}</AlertDescription>
+            </Alert>
           )}
 
           <div className="space-y-2">

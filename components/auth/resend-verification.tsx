@@ -46,13 +46,14 @@ export function ResendVerification({ email }: ResendVerificationProps) {
       <Button
         onClick={handleResend}
         disabled={isLoading}
-        variant="outline"
+        variant="default"
+        size="lg"
         className="w-full"
       >
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Sending...
+            Sending Verification Email...
           </>
         ) : (
           <>

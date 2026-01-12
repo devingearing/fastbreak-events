@@ -61,6 +61,7 @@ export async function signUp(prevState: any, formData: FormData) {
     return {
       success: true,
       message: 'Please check your email to verify your account before signing in.',
+      email: data.user.email,
     }
   }
 
