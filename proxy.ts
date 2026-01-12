@@ -31,6 +31,7 @@ export async function proxy(request: NextRequest) {
 
   // Refresh session if expired - required for Server Components
   const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
 
   // Check auth for protected routes
   const isProtectedRoute = request.nextUrl.pathname.startsWith('/events')
@@ -43,7 +44,9 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (user && isAuthRoute) {
+  // Only redirect away from auth pages if user has a valid session (is verified)
+  // This allows unverified users to stay on signup/login pages to see error messages
+  if (session && isAuthRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/events'
     return NextResponse.redirect(url)
