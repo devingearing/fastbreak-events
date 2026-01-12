@@ -15,9 +15,14 @@ export default async function EventDetailPage({
 }: {
   params: { id: string }
 }) {
+  console.log('EventDetailPage - Event ID from params:', params.id)
+
   const result = await getEvent(params.id)
 
+  console.log('EventDetailPage - Result:', result)
+
   if (result.error || !result.data) {
+    console.error('Event not found or error:', result.error)
     notFound()
   }
 
