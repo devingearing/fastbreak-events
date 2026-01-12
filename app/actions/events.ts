@@ -171,7 +171,7 @@ export async function getEvents(filters?: {
 }
 
 export async function getEvent(id: string) {
-  return actionWrapper(async (supabase) => {
+  return authActionWrapper(async (supabase, user) => {
     const db = supabase as any
     const { data, error } = await db
       .from('events')
@@ -202,7 +202,7 @@ export async function getEvent(id: string) {
     }
 
     return eventWithVenues
-  }, false) // Don't require auth for viewing events
+  }) // Require auth to view events
 }
 
 export async function getUserEvents() {
