@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { resendVerificationEmail } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, Mail } from 'lucide-react'
+import { Loader2, Mail, Clock } from 'lucide-react'
 
 interface ResendVerificationProps {
   email: string
@@ -13,14 +13,31 @@ interface ResendVerificationProps {
 export function ResendVerification({ email }: ResendVerificationProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<{ success?: boolean; message?: string; error?: string } | null>(null)
+  const [cooldownSeconds, setCooldownSeconds] = useState(0)
+
+  useEffect(() => {
+    if (cooldownSeconds > 0) {
+      const timer = setTimeout(() => {
+        setCooldownSeconds(cooldownSeconds - 1)
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [cooldownSeconds])
 
   async function handleResend() {
+    if (cooldownSeconds > 0) return
+
     setIsLoading(true)
     setResult(null)
 
     try {
       const response = await resendVerificationEmail(email)
       setResult(response)
+
+      // Start cooldown if successful
+      if (response.success) {
+        setCooldownSeconds(60)
+      }
     } catch (error) {
       setResult({ error: 'An unexpected error occurred.' })
     } finally {
@@ -45,7 +62,7 @@ export function ResendVerification({ email }: ResendVerificationProps) {
 
       <Button
         onClick={handleResend}
-        disabled={isLoading}
+        disabled={isLoading || cooldownSeconds > 0}
         variant="default"
         size="lg"
         className="w-full"
@@ -54,6 +71,11 @@ export function ResendVerification({ email }: ResendVerificationProps) {
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Sending Verification Email...
+          </>
+        ) : cooldownSeconds > 0 ? (
+          <>
+            <Clock className="mr-2 h-4 w-4" />
+            Resend in {cooldownSeconds}s
           </>
         ) : (
           <>

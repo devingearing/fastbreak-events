@@ -158,31 +158,24 @@ export async function resendVerificationEmail(email: string) {
 
   const supabase = await createClient()
 
-  // There's no direct API to resend verification email in Supabase
-  // We'll try to sign up again which will trigger a new email if user exists but unverified
-  const { error, data } = await supabase.auth.signUp({
-    email,
-    password: Math.random().toString(36), // Dummy password, won't be used
+  // Use the proper resend method
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email: email,
     options: {
       emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-    },
+    }
   })
 
-  // If we get a user but no session, email was sent
-  if (data?.user && !data.session) {
-    return {
-      success: true,
-      message: 'Verification email sent! Please check your inbox.',
-    }
-  }
-
   if (error) {
+    console.error('Resend verification error:', error)
     return {
-      error: 'Unable to resend verification email. Please try again later.',
+      error: error.message || 'Unable to resend verification email. Please try again later.',
     }
   }
 
   return {
-    error: 'Unable to resend verification email. The account may already be verified.',
+    success: true,
+    message: 'Verification email sent! Please check your inbox.',
   }
 }
