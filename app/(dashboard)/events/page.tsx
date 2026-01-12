@@ -53,7 +53,11 @@ export default async function EventsPage({
 
       <EventFilters />
 
-      <EventsGrid events={result.data || []} currentUserId={currentUser?.id} />
+      <EventsGrid
+        events={result.data || []}
+        currentUserId={currentUser?.id}
+        hasFilters={!!searchParams.search || !!searchParams.sport_type}
+      />
     </div>
   )
 }

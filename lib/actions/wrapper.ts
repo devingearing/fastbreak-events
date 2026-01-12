@@ -38,13 +38,6 @@ export async function actionWrapper<T>(
     return { data, error: null }
   } catch (error) {
     console.error('Action error:', error)
-    console.error('Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : undefined,
-      code: (error as any)?.code,
-      hint: (error as any)?.hint,
-      details: (error as any)?.details
-    })
 
     if (error instanceof ActionError) {
       return {

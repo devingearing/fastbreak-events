@@ -10,9 +10,10 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 interface EventsGridProps {
   events: EventWithVenues[]
   currentUserId?: string
+  hasFilters?: boolean
 }
 
-export function EventsGrid({ events, currentUserId }: EventsGridProps) {
+export function EventsGrid({ events, currentUserId, hasFilters = false }: EventsGridProps) {
   const router = useRouter()
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -36,9 +37,13 @@ export function EventsGrid({ events, currentUserId }: EventsGridProps) {
   if (events.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">No events found.</p>
+        <p className="text-muted-foreground">
+          {hasFilters ? 'No events match your filters.' : 'No events found.'}
+        </p>
         <p className="text-sm text-muted-foreground mt-2">
-          Create your first event to get started!
+          {hasFilters
+            ? 'Try adjusting your search or filter criteria.'
+            : 'Create your first event to get started!'}
         </p>
       </div>
     )

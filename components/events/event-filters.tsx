@@ -28,7 +28,7 @@ export function EventFilters() {
   const [isPending, startTransition] = useTransition()
 
   const currentSearch = searchParams.get('search') || ''
-  const currentSport = searchParams.get('sport') || ''
+  const currentSportType = searchParams.get('sport_type') || ''
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
@@ -52,7 +52,7 @@ export function EventFilters() {
   const handleSportChange = (sport: string) => {
     startTransition(() => {
       const value = sport === 'All Sports' ? '' : sport
-      router.push(`${pathname}?${createQueryString('sport', value)}`)
+      router.push(`${pathname}?${createQueryString('sport_type', value)}`)
     })
   }
 
@@ -62,7 +62,7 @@ export function EventFilters() {
     })
   }
 
-  const hasFilters = currentSearch || currentSport
+  const hasFilters = currentSearch || currentSportType
 
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -79,7 +79,7 @@ export function EventFilters() {
 
       <div className="flex gap-2">
         <Select
-          value={currentSport || 'All Sports'}
+          value={currentSportType || 'All Sports'}
           onValueChange={handleSportChange}
         >
           <SelectTrigger className="w-[160px]">
