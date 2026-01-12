@@ -15,10 +15,18 @@ export default async function DebugPage() {
     .select('id, name, user_id, created_at')
 
   // Try to get events with RLS
-  const { data: userEvents, error: userEventsError } = await supabase
-    .from('events')
-    .select('id, name, user_id, created_at')
-    .eq('user_id', user?.id)
+  let userEvents = null
+  let userEventsError = null
+
+  if (user?.id) {
+    const result = await supabase
+      .from('events')
+      .select('id, name, user_id, created_at')
+      .eq('user_id', user.id)
+
+    userEvents = result.data
+    userEventsError = result.error
+  }
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
