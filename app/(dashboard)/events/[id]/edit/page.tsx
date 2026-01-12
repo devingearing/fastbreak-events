@@ -12,8 +12,12 @@ export default async function EditEventPage({
 }: {
   params: { id: string }
 }) {
+  // In Next.js 15, params might be a Promise
+  const resolvedParams = await Promise.resolve(params)
+  const eventId = resolvedParams.id
+
   const [eventResult, venuesResult] = await Promise.all([
-    getEvent(params.id),
+    getEvent(eventId),
     getVenues(),
   ])
 

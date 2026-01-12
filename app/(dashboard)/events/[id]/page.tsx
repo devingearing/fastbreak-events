@@ -15,9 +15,13 @@ export default async function EventDetailPage({
 }: {
   params: { id: string }
 }) {
-  console.log('EventDetailPage - Event ID from params:', params.id)
+  // In Next.js 15, params might be a Promise
+  const resolvedParams = await Promise.resolve(params)
+  const eventId = resolvedParams.id
 
-  const result = await getEvent(params.id)
+  console.log('EventDetailPage - Event ID from params:', eventId)
+
+  const result = await getEvent(eventId)
 
   console.log('EventDetailPage - Result:', result)
 
