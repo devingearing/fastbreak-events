@@ -7,8 +7,6 @@ export default async function TestDBPage() {
   let user = null
   let eventsError = null
   let eventsData = null
-  let rawQueryError = null
-  let rawQueryData = null
 
   try {
     const supabase = await createClient()
@@ -26,10 +24,7 @@ export default async function TestDBPage() {
     eventsData = eventsResult.data
     eventsError = eventsResult.error
 
-    // Try raw SQL query
-    const rawResult = await supabase.rpc('get_user_id', {})
-      .single()
-      .catch(() => null)
+    // Skip raw SQL query as function doesn't exist
 
   } catch (e) {
     console.error('Test DB error:', e)
