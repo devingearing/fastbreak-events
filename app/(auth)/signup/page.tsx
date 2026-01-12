@@ -15,7 +15,7 @@ export default function SignUpPage() {
   const [state, formAction, isPending] = useActionState(signUp, null)
 
   // If user already exists but email is unverified
-  if (state?.error?.code === 'unverified_email' && state?.error?.email) {
+  if (state?.error && 'code' in state.error && state.error.code === 'unverified_email' && state.error.email) {
     return (
       <Card>
         <CardHeader className="space-y-1 text-center">
