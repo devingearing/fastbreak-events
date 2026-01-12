@@ -32,6 +32,7 @@ export function ResendVerification({ email }: ResendVerificationProps) {
 
     try {
       const response = await resendVerificationEmail(email)
+      console.log('Resend response:', response)
       setResult(response)
 
       // Start cooldown if successful
@@ -39,6 +40,7 @@ export function ResendVerification({ email }: ResendVerificationProps) {
         setCooldownSeconds(60)
       }
     } catch (error) {
+      console.error('Resend error:', error)
       setResult({ error: 'An unexpected error occurred.' })
     } finally {
       setIsLoading(false)

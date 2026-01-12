@@ -158,24 +158,45 @@ export async function resendVerificationEmail(email: string) {
 
   const supabase = await createClient()
 
-  // Use the proper resend method
-  const { error } = await supabase.auth.resend({
-    type: 'signup',
-    email: email,
-    options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
-    }
-  })
+  try {
+    // Try using signInWithOtp which triggers a new verification email
+    const { error, data } = await supabase.auth.signInWithOtp({
+      email: email,
+      options: {
+        shouldCreateUser: false, // Don't create a new user
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+      }
+    })
 
-  if (error) {
-    console.error('Resend verification error:', error)
+    console.log('Resend OTP response:', { error, data })
+
+    if (error) {
+      // If OTP fails, try the original signup method as fallback
+      console.log('OTP failed, trying signup method...')
+      const { error: signupError } = await supabase.auth.signUp({
+        email,
+        password: Math.random().toString(36).slice(-8) + 'Aa1!', // Random but valid password
+        options: {
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+        },
+      })
+
+      if (signupError) {
+        console.error('Resend verification error:', signupError)
+        return {
+          error: signupError.message || 'Unable to resend verification email. Please try again later.',
+        }
+      }
+    }
+
     return {
-      error: error.message || 'Unable to resend verification email. Please try again later.',
+      success: true,
+      message: 'Verification email sent! Please check your inbox.',
     }
-  }
-
-  return {
-    success: true,
-    message: 'Verification email sent! Please check your inbox.',
+  } catch (err) {
+    console.error('Resend email error:', err)
+    return {
+      error: 'An unexpected error occurred. Please try again later.',
+    }
   }
 }
