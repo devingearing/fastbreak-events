@@ -57,14 +57,24 @@ export async function signUp(prevState: any, formData: FormData) {
 
   // Check if email confirmation is required
   if (data?.user && !data.session) {
+    console.log('User created but needs email verification:', data.user.email)
     return {
       success: true,
       message: 'Please check your email to verify your account before signing in.',
     }
   }
 
-  // If no email confirmation required, redirect
-  redirect('/events')
+  // If user is created AND session exists (no email confirmation required), redirect
+  if (data?.user && data.session) {
+    redirect('/events')
+  }
+
+  // This shouldn't happen, but handle it just in case
+  return {
+    error: {
+      message: 'An unexpected error occurred during signup.',
+    },
+  }
 }
 
 export async function signIn(prevState: any, formData: FormData) {

@@ -25,14 +25,19 @@ export default function LoginPage() {
       <CardContent>
         <form action={formAction} className="space-y-4">
           {state?.error && 'message' in state.error && (
-            <>
-              <Alert variant="destructive">
+            <div className="space-y-4">
+              <Alert variant={state.error.code === 'unverified_email' ? 'default' : 'destructive'}>
                 <AlertDescription>{state.error.message}</AlertDescription>
               </Alert>
               {state.error.code === 'unverified_email' && state.error.email && (
-                <ResendVerification email={state.error.email} />
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground text-center">
+                    Need a new verification email?
+                  </p>
+                  <ResendVerification email={state.error.email} />
+                </div>
               )}
-            </>
+            </div>
           )}
 
           <div className="space-y-2">

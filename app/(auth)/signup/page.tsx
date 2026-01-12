@@ -8,11 +8,46 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2 } from "lucide-react"
+import { Loader2, CheckCircle } from "lucide-react"
 import { ResendVerification } from "@/components/auth/resend-verification"
 
 export default function SignUpPage() {
   const [state, formAction, isPending] = useActionState(signUp, null)
+
+  // If signup was successful and email verification is needed
+  if (state?.success) {
+    return (
+      <Card>
+        <CardHeader className="space-y-1 text-center">
+          <div className="flex justify-center mb-4">
+            <CheckCircle className="h-12 w-12 text-green-500" />
+          </div>
+          <CardTitle className="text-2xl font-bold">Check Your Email!</CardTitle>
+          <CardDescription className="text-base">
+            {state.message}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert>
+            <AlertDescription>
+              We've sent a verification link to your email address. Please click the link to verify your account before signing in.
+            </AlertDescription>
+          </Alert>
+
+          <div className="text-center text-sm text-muted-foreground">
+            <p>Didn't receive the email?</p>
+            <p>Check your spam folder or request a new verification email.</p>
+          </div>
+
+          <div className="pt-4">
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/login">Go to Login</Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card>
@@ -33,12 +68,6 @@ export default function SignUpPage() {
                 <ResendVerification email={state.error.email} />
               )}
             </>
-          )}
-
-          {state?.success && (
-            <Alert>
-              <AlertDescription>{state.message}</AlertDescription>
-            </Alert>
           )}
 
           <div className="space-y-2">
